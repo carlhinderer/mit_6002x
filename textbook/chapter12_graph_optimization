@@ -44,6 +44,9 @@ CHAPTER 12 - GRAPH OPTIMIZATION
         def getValue(self):
             return self.value
 
+        def getWeight(self):
+            return self.weight
+
         def __set__(self):
             return '<' + self.name + ' , ' + str(self.value) + ' , ' + str(self.weight) + '>'
 
@@ -61,3 +64,90 @@ CHAPTER 12 - GRAPH OPTIMIZATION
         itemsCopy = sorted(items, key=keyFunction, reverse=True)
         result = []
         totalValue, totalWeight = 0.0, 0.0
+        for i in range(len(itemsCopy)):
+            if (totalWeight + itemsCopy[i].getWeight()) < maxWeight:
+                result.append(itemsCopy[i])
+                totalWeight += itemsCopy[i].getWeight()
+                totalValue += itemsCopy[i].getValue()
+        return (result, totalValue)
+
+    def buildItems():
+        names = ['clock', 'painting', 'radio', 'vase', 'book', 'computer']
+        values = [175, 90, 20, 50, 10, 200]
+        weights = [10, 9, 4, 2, 1, 20]
+        items = []
+        for i in range(len(values)):
+            items.append(Item(names[i], values[i], weights[i]))
+        return items
+
+    def testGreedy(items, maxWeight, keyFunction):
+        taken, val = greedy(items, maxWeight, keyFunction)
+        print('Total value of items taken is: %s' % val)
+        for item in taken:
+            print('    ', item)
+
+    def testGreedys(maxWeight=20):
+        items = buildItems()
+
+        print('Use greedy by value to fill knapsack of size', maxWeight)
+        testGreedy(items, maxWeight, value)
+
+        print('Use greedy by weight to fill knapsack of size', maxWeight)
+        testGreedy(items, maxWeight, weightInverse)
+
+        print('Use greedy by density to fill knapsack of size', maxWeight)
+        testGreedy(items, maxWeight, density)
+
+
+
+- An Optimal Solution to the 0/1 Knapsack Problem
+
+    Suppose we decide an approximation isn't good enough; we want the optimal solution to
+      the problem.  
+
+    The '0/1 Knapsack Problem' is formulated as follows:
+      1. Each item is represented by a pair, <value, weight>
+
+      2. The knapsack can accomodate items with a total weight of no more than w.
+
+      3. The vector I, of length n, represents the set of available items.  Each element of the vector
+           is an item.
+
+      4. The vector V, or length n, is used to indicate whether or not each item is taken by the
+           burglar.  If V[i]=1, item I[i] is taken.  If V[i]=0, item I[i] is not taken.
+
+      5. Find a V that maximizes
+             sum(i=0 -> n-1) V[i] * I[i].value
+           subject to the constraint that
+             sum(i=0 -> n-1) V[i]*I[i].weight <= w
+
+
+
+- Optimal Solution Using Brute Force
+
+    1. Enumerate all possible combinations of items (generate the power set of items).
+    2. Remove all combinates whose weight exceeds the allowed weight.
+    3. From the remaining combinations, choose the one with the largest value.
+
+
+    def chooseBest(pset, maxWeight, getVal, getWeight):
+        bestVal = 0.0
+        bestSet = None
+        for items in pset:
+            itemsVal = 0.0
+            itemsWeight = 0.0
+            for item in items:
+                itemsVal += getVal(item)
+                itemsWeight += getWeight(item)
+            if itemsWeight <= maxWeight and itemsVal > bestVal:
+                bestVal = itemsVal
+                bestSet = items
+        return (bestSet, bestVal)
+
+    def testBest(maxWeight=20):
+        items = buildItems()
+        pset = genPowerset(items)
+        taken, val = chooseBest(pset, maxWeight, Item.getValue, Item.getWeight)
+        print('Total value of items taken is:', val)
+        for item in taken:
+            print(item)
