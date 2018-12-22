@@ -1,0 +1,63 @@
+-------------------------------------------------
+CHAPTER 12 - GRAPH OPTIMIZATION
+-------------------------------------------------
+
+- Knapsack Problems
+
+    Suppose a burglar is breaking into a house and wants to figure out what to steal.
+      For instance, suppose the burglar can only hold 20 lbs in his knapsack.  These
+      are the values of the available items:
+
+
+      Item           Value           Weight          Value/Weight
+      ----------------------------------------------------------------
+      Clock          175             10              17.5
+      Painting       90              9               10
+      Radio          20              4               5
+      Vase           50              2               25
+      Book           10              1               10
+      Computer       200             20              10
+
+
+
+- Greedy Algorithms
+
+    The simplest way to solve the problem is with a greedy algorithm.  We'll choose the
+      best item first, then the next best, until our weight limit is reached.
+
+    Of course, the 'best' item could either be the highest-value, the lowest-weight, or
+      the highest-density.
+
+
+
+- Greedy Implementations
+
+    class Item(object):
+        def __init__(self, n, v, w):
+            self.name = n
+            self.value = v
+            self.weight = w
+
+        def getName(self):
+            return self.name
+
+        def getValue(self):
+            return self.value
+
+        def __set__(self):
+            return '<' + self.name + ' , ' + str(self.value) + ' , ' + str(self.weight) + '>'
+
+    
+    def value(item):
+        return item.getValue()
+
+    def weightInverse(item):
+        return 1.0 / item.getWeight()
+
+    def density(item):
+        return item.getValue() / item.getWeight()
+
+    def greedy(items, maxWeight, keyFunction):
+        itemsCopy = sorted(items, key=keyFunction, reverse=True)
+        result = []
+        totalValue, totalWeight = 0.0, 0.0
